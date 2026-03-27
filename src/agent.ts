@@ -172,17 +172,25 @@ export class CrushAgent implements acp.Agent {
         id: CONFIG_THINKING,
         name: "Thinking",
         description: "Extended thinking mode for reasoning models",
-        type: "boolean",
-        currentValue: false,
+        type: "select",
+        currentValue: "off",
         category: "behavior",
+        options: [
+          { value: "off", name: "Off", description: "Standard responses" },
+          { value: "on", name: "On", description: "Extended thinking enabled" },
+        ],
       },
       {
         id: CONFIG_YOLO,
         name: "Yolo",
         description: "Auto-accept all permissions",
-        type: "boolean",
-        currentValue: false,
+        type: "select",
+        currentValue: "off",
         category: "behavior",
+        options: [
+          { value: "off", name: "Off", description: "Confirm permissions" },
+          { value: "on", name: "On", description: "Auto-accept all" },
+        ],
       },
     ];
 
@@ -283,12 +291,12 @@ export class CrushAgent implements acp.Agent {
 
     // Handle thinking mode toggle
     if (params.configId === CONFIG_THINKING) {
-      session.thinkingMode = params.value as boolean;
+      session.thinkingMode = (params.value as string) === "on";
     }
 
     // Handle yolo mode toggle
     if (params.configId === CONFIG_YOLO) {
-      session.yoloMode = params.value as boolean;
+      session.yoloMode = (params.value as string) === "on";
       // Sync with mode selector
       if (session.yoloMode && session.currentModeId !== "yolo") {
         session.currentModeId = "yolo";
@@ -335,17 +343,25 @@ export class CrushAgent implements acp.Agent {
         id: CONFIG_THINKING,
         name: "Thinking",
         description: "Extended thinking mode for reasoning models",
-        type: "boolean",
-        currentValue: session.thinkingMode,
+        type: "select",
+        currentValue: session.thinkingMode ? "on" : "off",
         category: "behavior",
+        options: [
+          { value: "off", name: "Off", description: "Standard responses" },
+          { value: "on", name: "On", description: "Extended thinking enabled" },
+        ],
       },
       {
         id: CONFIG_YOLO,
         name: "Yolo",
         description: "Auto-accept all permissions",
-        type: "boolean",
-        currentValue: session.yoloMode,
+        type: "select",
+        currentValue: session.yoloMode ? "on" : "off",
         category: "behavior",
+        options: [
+          { value: "off", name: "Off", description: "Confirm permissions" },
+          { value: "on", name: "On", description: "Auto-accept all" },
+        ],
       },
     ];
   }
