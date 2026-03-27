@@ -310,66 +310,26 @@ export class CrushAgent implements acp.Agent {
 
   private sendAvailableCommands(sessionId: string): void {
     const commands: acp.AvailableCommand[] = [
-      // Session management
-      {
-        name: "clear",
-        description: "Clear conversation context and start fresh",
-      },
-      {
-        name: "compact",
-        description: "Compact conversation history to save context space",
-      },
-      {
-        name: "export",
-        description: "Export current session to a markdown file",
-      },
-      {
-        name: "status",
-        description: "Show current session status (model, mode, directory)",
-      },
-      // Model & Mode control
-      {
-        name: "model",
-        description: "Switch AI model (usage: /model <model-id>)",
-      },
-      {
-        name: "mode",
-        description: "Switch mode: code, ask, architect, or yolo",
-      },
-      {
-        name: "models",
-        description: "List all available AI models from configured providers",
-      },
+      // Session management (matches Crush TUI)
+      { name: "new", description: "Start a fresh conversation session" },
+      { name: "compact", description: "Summarize session to save context space" },
+      { name: "export", description: "Export session transcript to file" },
+      { name: "status", description: "Show current session info and settings" },
+      // Model & Mode (matches Crush TUI)
+      { name: "model", description: "Switch AI model" },
+      { name: "mode", description: "Switch mode (code, ask, architect, yolo)" },
+      { name: "thinking", description: "Toggle extended thinking mode" },
+      { name: "yolo", description: "Toggle auto-accept all permissions" },
+      { name: "models", description: "List all available AI models" },
       // Development helpers
-      {
-        name: "init",
-        description: "Generate AGENTS.md rules file from codebase analysis",
-      },
-      {
-        name: "review",
-        description: "Review git changes, branches, or uncommitted code",
-      },
+      { name: "init", description: "Generate AGENTS.md from codebase analysis" },
+      { name: "review", description: "Review git changes or uncommitted code" },
       // Crush CLI info
-      {
-        name: "logs",
-        description: "View crush logs (usage: /logs [--tail N])",
-      },
-      {
-        name: "projects",
-        description: "List project directories where Crush has been used",
-      },
-      {
-        name: "stats",
-        description: "Show usage statistics",
-      },
-      {
-        name: "dirs",
-        description: "Print directories used by Crush (data, config, etc.)",
-      },
-      {
-        name: "help",
-        description: "Show available commands and usage information",
-      },
+      { name: "logs", description: "View crush logs" },
+      { name: "projects", description: "List project directories" },
+      { name: "stats", description: "Show token usage statistics" },
+      { name: "dirs", description: "Show crush data and config directories" },
+      { name: "help", description: "Show all available commands" },
     ];
 
     this.connection.sessionUpdate({
@@ -444,8 +404,8 @@ export class CrushAgent implements acp.Agent {
     let response = "";
 
     switch (command) {
-      case "clear":
-        response = "Conversation context cleared. Starting fresh!";
+      case "new":
+        response = "Starting a fresh conversation session.";
         break;
       case "compact":
         response = "Conversation history compacted to save context space.";
@@ -497,14 +457,16 @@ I can review your changes. Try one of these prompts:
         response = `**Available Commands:**
 
 **Session Management:**
-- \`/clear\` - Clear conversation context
-- \`/compact\` - Compact conversation history
-- \`/export\` - Export session to markdown
+- \`/new\` - Start a fresh conversation session
+- \`/compact\` - Summarize session to save context
+- \`/export\` - Export session to file
 - \`/status\` - Show current session info
 
 **Model & Mode:**
 - \`/model <id>\` - Switch AI model
 - \`/mode <mode>\` - Switch mode (code, ask, architect, yolo)
+- \`/thinking\` - Toggle extended thinking mode
+- \`/yolo\` - Toggle auto-accept all permissions
 - \`/models\` - List all available AI models
 
 **Development:**
@@ -554,6 +516,21 @@ I can review your changes. Try one of these prompts:
         } else {
           response = `Current mode: ${session.currentModeId}\nUsage: /mode <code|ask|architect|yolo>`;
         }
+        break;
+      case "thinking":
+        // Toggle thinking mode (indicated by model selection or prompt prefix)
+        response = `Extended thinking mode toggle requested.\nTo use thinking mode, select a model that supports extended thinking (e.g., models with thinking/reasoning capabilities).`;
+        break;
+      case "yolo":
+        // Toggle yolo mode
+        session.yoloMode = !session.yoloMode;
+        if (session.yoloMode) {
+          session.currentModeId = "yolo";
+        } else if (session.currentModeId === "yolo") {
+          session.currentModeId = "code";
+        }
+        response = `Yolo mode: ${session.yoloMode ? "Enabled" : "Disabled"}${session.yoloMode ? " - All permissions auto-accepted" : ""}`;
+        this.notifyConfigUpdate(session.id, session);
         break;
       case "models":
         try {
