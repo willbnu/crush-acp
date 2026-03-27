@@ -173,11 +173,11 @@ export class CrushAgent implements acp.Agent {
         name: "Thinking",
         description: "Extended thinking mode for reasoning models",
         type: "select",
-        currentValue: "off",
+        currentValue: "disabled",
         category: "behavior",
         options: [
-          { value: "off", name: "Off", description: "Standard responses" },
-          { value: "on", name: "On", description: "Extended thinking enabled" },
+          { value: "disabled", name: "Disabled" },
+          { value: "enabled", name: "Enabled" },
         ],
       },
       {
@@ -185,11 +185,11 @@ export class CrushAgent implements acp.Agent {
         name: "Yolo",
         description: "Auto-accept all permissions",
         type: "select",
-        currentValue: "off",
+        currentValue: "disabled",
         category: "behavior",
         options: [
-          { value: "off", name: "Off", description: "Confirm permissions" },
-          { value: "on", name: "On", description: "Auto-accept all" },
+          { value: "disabled", name: "Disabled" },
+          { value: "enabled", name: "Enabled" },
         ],
       },
     ];
@@ -291,12 +291,12 @@ export class CrushAgent implements acp.Agent {
 
     // Handle thinking mode toggle
     if (params.configId === CONFIG_THINKING) {
-      session.thinkingMode = (params.value as string) === "on";
+      session.thinkingMode = (params.value as string) === "enabled";
     }
 
     // Handle yolo mode toggle
     if (params.configId === CONFIG_YOLO) {
-      session.yoloMode = (params.value as string) === "on";
+      session.yoloMode = (params.value as string) === "enabled";
       // Sync with mode selector
       if (session.yoloMode && session.currentModeId !== "yolo") {
         session.currentModeId = "yolo";
@@ -344,11 +344,11 @@ export class CrushAgent implements acp.Agent {
         name: "Thinking",
         description: "Extended thinking mode for reasoning models",
         type: "select",
-        currentValue: session.thinkingMode ? "on" : "off",
+        currentValue: session.thinkingMode ? "enabled" : "disabled",
         category: "behavior",
         options: [
-          { value: "off", name: "Off", description: "Standard responses" },
-          { value: "on", name: "On", description: "Extended thinking enabled" },
+          { value: "disabled", name: "Disabled" },
+          { value: "enabled", name: "Enabled" },
         ],
       },
       {
@@ -356,11 +356,11 @@ export class CrushAgent implements acp.Agent {
         name: "Yolo",
         description: "Auto-accept all permissions",
         type: "select",
-        currentValue: session.yoloMode ? "on" : "off",
+        currentValue: session.yoloMode ? "enabled" : "disabled",
         category: "behavior",
         options: [
-          { value: "off", name: "Off", description: "Confirm permissions" },
-          { value: "on", name: "On", description: "Auto-accept all" },
+          { value: "disabled", name: "Disabled" },
+          { value: "enabled", name: "Enabled" },
         ],
       },
     ];
