@@ -171,25 +171,25 @@ export class CrushAgent implements acp.Agent {
       {
         id: CONFIG_THINKING,
         name: "Thinking",
-        description: "Extended thinking mode for reasoning models",
+        description: "Enable extended thinking for better reasoning on complex tasks",
         type: "select",
         currentValue: "disabled",
         category: "behavior",
         options: [
-          { value: "disabled", name: "Disabled" },
-          { value: "enabled", name: "Enabled" },
+          { value: "disabled", name: "Thinking: Off" },
+          { value: "enabled", name: "Thinking: On" },
         ],
       },
       {
         id: CONFIG_YOLO,
         name: "Yolo",
-        description: "Auto-accept all permissions",
+        description: "Auto-accept all tool permissions without confirmation",
         type: "select",
         currentValue: "disabled",
         category: "behavior",
         options: [
-          { value: "disabled", name: "Disabled" },
-          { value: "enabled", name: "Enabled" },
+          { value: "disabled", name: "Yolo: Off" },
+          { value: "enabled", name: "Yolo: On" },
         ],
       },
     ];
@@ -342,25 +342,25 @@ export class CrushAgent implements acp.Agent {
       {
         id: CONFIG_THINKING,
         name: "Thinking",
-        description: "Extended thinking mode for reasoning models",
+        description: "Enable extended thinking for better reasoning on complex tasks",
         type: "select",
         currentValue: session.thinkingMode ? "enabled" : "disabled",
         category: "behavior",
         options: [
-          { value: "disabled", name: "Disabled" },
-          { value: "enabled", name: "Enabled" },
+          { value: "disabled", name: "Thinking: Off" },
+          { value: "enabled", name: "Thinking: On" },
         ],
       },
       {
         id: CONFIG_YOLO,
         name: "Yolo",
-        description: "Auto-accept all permissions",
+        description: "Auto-accept all tool permissions without confirmation",
         type: "select",
         currentValue: session.yoloMode ? "enabled" : "disabled",
         category: "behavior",
         options: [
-          { value: "disabled", name: "Disabled" },
-          { value: "enabled", name: "Enabled" },
+          { value: "disabled", name: "Yolo: Off" },
+          { value: "enabled", name: "Yolo: On" },
         ],
       },
     ];
