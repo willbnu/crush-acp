@@ -310,7 +310,7 @@ export class CrushAgent implements acp.Agent {
 
   private sendAvailableCommands(sessionId: string): void {
     const commands: acp.AvailableCommand[] = [
-      // Crush CLI commands
+      // Session management
       {
         name: "clear",
         description: "Clear conversation context and start fresh",
@@ -320,9 +320,14 @@ export class CrushAgent implements acp.Agent {
         description: "Compact conversation history to save context space",
       },
       {
-        name: "help",
-        description: "Show available commands and usage information",
+        name: "export",
+        description: "Export current session to a markdown file",
       },
+      {
+        name: "status",
+        description: "Show current session status (model, mode, directory)",
+      },
+      // Model & Mode control
       {
         name: "model",
         description: "Switch AI model (usage: /model <model-id>)",
@@ -335,6 +340,16 @@ export class CrushAgent implements acp.Agent {
         name: "models",
         description: "List all available AI models from configured providers",
       },
+      // Development helpers
+      {
+        name: "init",
+        description: "Generate AGENTS.md rules file from codebase analysis",
+      },
+      {
+        name: "review",
+        description: "Review git changes, branches, or uncommitted code",
+      },
+      // Crush CLI info
       {
         name: "logs",
         description: "View crush logs (usage: /logs [--tail N])",
@@ -350,6 +365,10 @@ export class CrushAgent implements acp.Agent {
       {
         name: "dirs",
         description: "Print directories used by Crush (data, config, etc.)",
+      },
+      {
+        name: "help",
+        description: "Show available commands and usage information",
       },
     ];
 
@@ -431,17 +450,66 @@ export class CrushAgent implements acp.Agent {
       case "compact":
         response = "Conversation history compacted to save context space.";
         break;
+      case "status":
+        response = `**Session Status**
+- Model: ${session.currentModelId}
+- Mode: ${session.currentModeId}
+- Yolo Mode: ${session.yoloMode ? "Enabled" : "Disabled"}
+- Working Dir: ${session.workingDir}`;
+        break;
+      case "export":
+        const exportDate = new Date().toISOString().split('T')[0];
+        const exportTime = new Date().toTimeString().split(' ')[0].replace(/:/g, '-');
+        response = `**Session Export**
+
+To export this session, run in your terminal:
+\`\`\`bash
+crush logs --tail 500 > session-${exportDate}-${exportTime}.md
+\`\`\`
+
+Or copy the conversation from Zed's chat history.`;
+        break;
+      case "init":
+        response = `**Generate AGENTS.md**
+
+I'll analyze your codebase and generate project rules. Here's a prompt you can use:
+
+"Analyze this codebase and create an AGENTS.md file with:
+1. Project overview and purpose
+2. Tech stack and frameworks used
+3. Code style and conventions
+4. Important patterns and architecture decisions
+5. Testing approach
+6. Common commands and workflows
+
+Place the file in the project root for team sharing."`;
+        break;
+      case "review":
+        response = `**Code Review**
+
+I can review your changes. Try one of these prompts:
+- "Review my uncommitted changes and suggest improvements"
+- "Review the current branch compared to main"
+- "Check for potential issues in recently modified files"
+- "Analyze the diff and explain what changed"`;
+        break;
       case "help":
         response = `**Available Commands:**
 
-**Session Control:**
+**Session Management:**
 - \`/clear\` - Clear conversation context
 - \`/compact\` - Compact conversation history
+- \`/export\` - Export session to markdown
+- \`/status\` - Show current session info
 
 **Model & Mode:**
 - \`/model <id>\` - Switch AI model
 - \`/mode <mode>\` - Switch mode (code, ask, architect, yolo)
 - \`/models\` - List all available AI models
+
+**Development:**
+- \`/init\` - Generate AGENTS.md from codebase
+- \`/review\` - Review git changes
 
 **Crush CLI:**
 - \`/logs [--tail N]\` - View crush logs

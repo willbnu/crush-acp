@@ -2,6 +2,16 @@
 
 All notable changes to crush-acp will be documented in this file.
 
+## [0.3.2] - 2026-03-27
+
+### Added
+- `/status` - Show current session info (model, mode, working dir)
+- `/export` - Export session to markdown (with terminal command tip)
+- `/init` - Generate AGENTS.md rules file from codebase
+- `/review` - Review git changes, branches, or uncommitted code
+- Reorganized slash commands by category (Session, Model/Mode, Development, CLI)
+- Combined best commands from OpenCode without duplication
+
 ## [0.3.1] - 2026-03-27
 
 ### Added
