@@ -8,16 +8,20 @@ Use [Crush](https://github.com/charmbracelet/crush) - Charm's AI coding agent - 
 
 Crush is your terminal coding bestie - a powerful AI assistant that works directly in your terminal with access to your tools, code, and workflows. This adapter brings Crush to editors like Zed via the Agent Client Protocol (ACP).
 
+**Platform guides:** [Windows Setup Guide](WINDOWS.md)
+
 ## Features
 
 - **Full Crush capabilities** from Zed's Agent Panel
-- **Model Selection** - Switch between models directly from Zed's UI
-- **Session Modes** - Code, Ask, and Architect modes for different workflows
-- **Dynamic Model List** - Automatically fetches available models from Crush
+- **Model Selection** - All models from all providers via `crush models`
+- **Session Modes** - Code, Ask, Architect, and Yolo modes
+- **Thinking Toggle** - Enable extended reasoning for complex tasks
+- **Yolo Toggle** - Auto-accept all permissions without confirmation
+- **Dynamic Model List** - Automatically fetches all available models from Crush
 - **Tool Call Visibility** - See what tools Crush is using in real-time
 - **Thinking Content** - Displays reasoning/thinking when models use it
 - **Session Titles** - Auto-generates descriptive titles for sessions
-- **Image Support** - Works with vision models (GLM-4.5V, GLM-4.6V)
+- **Image Support** - Works with vision models
 - **Context Files** - Includes files from Zed's context in prompts
 - **LSP-enhanced context**
 - **MCP server support**
@@ -28,7 +32,7 @@ Crush is your terminal coding bestie - a powerful AI assistant that works direct
 
 1. Install [Crush CLI](https://github.com/charmbracelet/crush#installation):
    ```bash
-   # Homebrew
+   # Homebrew (macOS/Linux)
    brew install charmbracelet/tap/crush
    
    # Or npm
@@ -110,7 +114,7 @@ Add Crush to your Zed `settings.json`:
     "Crush": {
       "type": "custom",
       "command": "node",
-      "args": ["C:/Users/Admin/Documents/Projects/crush-acp/dist/index.js"],
+      "args": ["/path/to/crush-acp/dist/index.js"],
       "env": {}
     }
   }
@@ -119,8 +123,7 @@ Add Crush to your Zed `settings.json`:
 
 **Keyboard Shortcut (Optional)**
 
-Add a keyboard shortcut in your `keymap.json`:
-
+macOS — add to `keymap.json`:
 ```json
 [
   {
@@ -134,34 +137,101 @@ Add a keyboard shortcut in your `keymap.json`:
 ]
 ```
 
+Windows/Linux — use `ctrl-alt-x` instead of `cmd-alt-x`.
+
 ### Using Crush in Zed
 
-1. Open the Agent Panel in Zed (usually `cmd+e` or via View menu)
+1. Open the Agent Panel in Zed (`cmd+e` / `ctrl+e` or via View menu)
 2. Click the `+` button in the top-right
 3. Select "Crush" from the list
 4. Start chatting with Crush!
 
-### Model Selection
+### Toolbar Controls
 
-Click the model dropdown in Zed's agent panel to switch between available models:
-- **GLM-5** - Latest and most capable
-- **GLM-4.7** - Balanced performance
-- **GLM-4.7-Flash** - Fastest responses
-- **GLM-4.5V / GLM-4.6V** - Vision models for image analysis
+The Zed agent panel toolbar shows these dropdowns:
+
+| Dropdown | Purpose |
+|----------|---------|
+| **Mode** | Code, Ask, Architect, or Yolo mode |
+| **Model** | All models from all configured providers |
+| **Thinking: On/Off** | Toggle extended thinking for better reasoning |
+| **Yolo: On/Off** | Toggle auto-accept all permissions |
+
+### Supported Providers & Models
+
+crush-acp automatically fetches **all models** from all providers configured in Crush via `crush models`. This includes:
+
+| Provider | Example Models |
+|----------|---------------|
+| **Zhipu AI (zai/)** | GLM-5.1, GLM-5, GLM-5-Turbo, GLM-4.7, GLM-4.7-Flash, GLM-4.6, GLM-4.6V, GLM-4.5, GLM-4.5v, GLM-4.5-Air |
+| **Zhipu Coding (zhipu-coding/)** | GLM-5, GLM-4.7, GLM-4.7-Flash, GLM-4.6, GLM-4.6V, GLM-4.5, GLM-4.5v, GLM-4.5-Air |
+| **OpenAI (openai/)** | GPT-5.4-Pro, GPT-5.4, GPT-5.3-Codex, GPT-5.2, GPT-5.1, GPT-5, O4-Mini, O3 |
+| **Anthropic (openrouter/anthropic/)** | Claude Opus 4.6, Claude Sonnet 4.6, Claude Sonnet 4.5, Claude Haiku 4.5 |
+| **Google (openrouter/google/)** | Gemini 3.1-Pro, Gemini 3-Flash, Gemini 2.5-Pro, Gemini 2.5-Flash |
+| **DeepSeek (openrouter/deepseek/)** | DeepSeek V3.2, DeepSeek R1-0528, DeepSeek Chat |
+| **Mistral (openrouter/mistralai/)** | Mistral Large, Devstral Medium, Codestral, Mistral Medium 3.1 |
+| **Meta (openrouter/meta-llama/)** | Llama 4 Maverick, Llama 4 Scout, Llama 3.3 70B |
+| **xAI (openrouter/x-ai/)** | Grok 4, Grok 4 Fast, Grok 4.1 Fast, Grok 3 |
+| **Qwen (openrouter/qwen/)** | Qwen 3.5-397B, Qwen 3 Coder, Qwen 3 Max, Qwen 3 235B |
+| **Cerebras (cerebras/)** | GPT-OSS-120B, Qwen-3-235B, GLM-4.7 |
+| **Groq (groq/)** | Kimi-K2, Qwen3-32B |
+| **Chutes (chutes/)** | DeepSeek R1, DeepSeek V3.1, Qwen3 models, GLM-4.5 |
+| **Others** | Moonshot Kimi, MiniMax, Cohere, Baidu Ernie, Xiaomi MiMo, StepFun, NVIDIA Nemotron, and more |
+
+The full list is dynamic — run `crush models` to see every model available with your current configuration.
+
+### API Keys
+
+Crush supports multiple providers. Set the appropriate environment variable:
+
+| Variable | Provider |
+|----------|----------|
+| `ZHIPU_API_KEY` | Zhipu AI (GLM models, default) |
+| `ANTHROPIC_API_KEY` | Anthropic (Claude) |
+| `OPENAI_API_KEY` | OpenAI (GPT) |
+| `GEMINI_API_KEY` | Google Gemini |
+| `GROQ_API_KEY` | Groq |
+| `OPENROUTER_API_KEY` | OpenRouter (access to 200+ models) |
+| `VERCEL_API_KEY` | Vercel AI Gateway |
+| `CEREBRAS_API_KEY` | Cerebras |
+| `CHUTES_API_KEY` | Chutes |
 
 ### Session Modes
 
-Switch modes to change Crush's behavior:
-- **Code** - Full coding mode with file access and terminal
-- **Ask** - Answer questions without making changes
-- **Architect** - Plan and design without implementation
+| Mode | Description |
+|------|-------------|
+| **Code** | Full coding mode with file access and terminal |
+| **Ask** | Answer questions without making changes |
+| **Architect** | Plan and design without implementation |
+| **Yolo** | Auto-accept all permissions (dangerous mode) |
+
+### Slash Commands
+
+| Command | Description |
+|---------|-------------|
+| `/new` | Start a fresh conversation session |
+| `/compact` | Summarize session to save context space |
+| `/export` | Export session transcript to file |
+| `/status` | Show current session info and settings |
+| `/model <id>` | Switch AI model |
+| `/models` | List all available AI models |
+| `/mode <mode>` | Switch mode (code, ask, architect, yolo) |
+| `/thinking` | Toggle extended thinking mode |
+| `/yolo` | Toggle auto-accept all permissions |
+| `/init` | Generate AGENTS.md from codebase analysis |
+| `/review` | Review git changes or uncommitted code |
+| `/logs` | View crush logs |
+| `/projects` | List project directories |
+| `/stats` | Show token usage statistics |
+| `/dirs` | Show crush data and config directories |
+| `/help` | Show all available commands |
 
 ## Development
 
 ### Setup
 
 ```bash
-git clone https://github.com/charmbracelet/crush-acp.git
+git clone https://github.com/willbnu/crush-acp.git
 cd crush-acp
 npm install
 ```
@@ -191,19 +261,7 @@ This adapter implements the [Agent Client Protocol (ACP)](https://agentclientpro
 - Streams output back to the client via `session/update` notifications
 - Parses Crush output for tool calls and sends `tool_call` updates
 - Extracts thinking/reasoning content wrapped in `<think/>` tags
-
-## Improvements in v0.2.0
-
-| Feature | Description |
-|---------|-------------|
-| Dynamic Model Fetching | Models are fetched from `crush models` at startup |
-| Model Selection | Switch models from Zed's UI dropdown |
-| Session Modes | Code/Ask/Architect mode switching |
-| Tool Call Visibility | Real-time tool call status updates |
-| Thinking Content | Displays reasoning when available |
-| Session Titles | Auto-generated from first prompt |
-| Image Support | Vision model compatibility |
-| Better Error Handling | Proper ACP error codes |
+- Supports config options for mode, model, thinking, and yolo toggles
 
 ## Limitations
 
@@ -211,20 +269,6 @@ This adapter implements the [Agent Client Protocol (ACP)](https://agentclientpro
 - Tool call details: Limited to what Crush outputs in non-interactive mode
 
 Future versions will improve these with tighter integration.
-
-## API Keys
-
-Crush supports multiple providers. Set the appropriate environment variable:
-
-| Variable | Provider |
-|----------|----------|
-| `ZHIPU_API_KEY` | Zhipu AI (GLM models) |
-| `ANTHROPIC_API_KEY` | Anthropic (Claude) |
-| `OPENAI_API_KEY` | OpenAI (GPT) |
-| `GEMINI_API_KEY` | Google Gemini |
-| `GROQ_API_KEY` | Groq |
-| `OPENROUTER_API_KEY` | OpenRouter |
-| `VERCEL_API_KEY` | Vercel AI Gateway |
 
 ## Contributing
 
@@ -238,5 +282,6 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 - [Crush](https://github.com/charmbracelet/crush) - The main Crush CLI
 - [Agent Client Protocol](https://agentclientprotocol.com) - Protocol specification
+- [ACP Registry](https://github.com/agentclientprotocol/registry) - Registry of ACP-compatible agents
 - [Zed](https://zed.dev) - High-performance editor with ACP support
 - [Charm](https://charm.sh) - The team behind Crush

@@ -1,6 +1,6 @@
 {
   "name": "crush-acp",
-  "version": "0.3.3",
+  "version": "0.4.0",
   "description": "ACP adapter for Crush CLI - use Crush from Zed and other ACP-compatible editors",
   "type": "module",
   "main": "dist/index.js",

@@ -17,38 +17,39 @@ interface CrushSession {
 // Fetch models dynamically from Crush CLI at startup
 function fetchAvailableModels(): acp.ModelInfo[] {
   try {
-    const output = execSync("crush models", { encoding: "utf-8", timeout: 5000 });
+    const output = execSync("crush models", { encoding: "utf-8", timeout: 10000 });
     const lines = output.trim().split("\n").filter(Boolean);
     
-    // Filter to zhipu-coding models (primary provider) and limit to reasonable list
-    const filteredLines = lines.filter(line => 
-      line.startsWith("zhipu-coding/") || 
-      line.startsWith("zai/")
-    ).slice(0, 20);
-    
-    return filteredLines.map(line => {
+    return lines.map(line => {
       const modelId = line.trim();
-      const name = modelId.split("/").pop() || modelId;
-      const isVision = name.includes("v") || name.toLowerCase().includes("vision");
-      const isFlash = name.includes("flash") || name.includes("air");
-      const isLatest = name.includes("5") || name === "glm-4.7";
+      const parts = modelId.split("/");
+      const provider = parts.length > 1 ? parts[0] : "unknown";
+      const modelName = parts.length > 1 ? parts.slice(1).join("/") : modelId;
       
-      let description = `Zhipu ${name}`;
+      const isVision = modelName.toLowerCase().includes("v") && !modelName.toLowerCase().includes("vision");
+      const isFlash = modelName.includes("flash") || modelName.includes("air") || modelName.includes("lite") || modelName.includes("mini") || modelName.includes("nano");
+      const isThinking = modelId.includes(":thinking") || modelId.includes(":THINKING");
+      
+      let description = `${provider}/${modelName}`;
       if (isVision) description += " (Vision)";
       if (isFlash) description += " (Fast)";
-      if (isLatest && !isVision && !isFlash) description += " (Latest)";
+      if (isThinking) description += " (Thinking)";
       
       return {
         modelId,
-        name: name.toUpperCase(),
+        name: `${provider}/${modelName}`,
         description,
       };
     });
   } catch (err) {
     console.error("[crush-acp] Failed to fetch models from Crush CLI, using defaults:", err);
     return [
-      { modelId: "zhipu-coding/glm-5", name: "GLM-5", description: "Zhipu GLM-5 (Latest)" },
-      { modelId: "zhipu-coding/glm-4.7", name: "GLM-4.7", description: "Zhipu GLM-4.7" },
+      { modelId: "zai/glm-5.1", name: "zai/glm-5.1", description: "GLM-5.1 (Latest)" },
+      { modelId: "zai/glm-5", name: "zai/glm-5", description: "GLM-5" },
+      { modelId: "zai/glm-4.7", name: "zai/glm-4.7", description: "GLM-4.7" },
+      { modelId: "zai/glm-4.7-flash", name: "zai/glm-4.7-flash", description: "GLM-4.7 Flash (Fast)" },
+      { modelId: "openai/gpt-5.1", name: "openai/gpt-5.1", description: "GPT-5.1" },
+      { modelId: "anthropic/claude-sonnet-4.5", name: "anthropic/claude-sonnet-4.5", description: "Claude Sonnet 4.5" },
     ];
   }
 }
@@ -69,7 +70,7 @@ const CONFIG_MODEL = "model";
 const CONFIG_THINKING = "thinking";
 const CONFIG_YOLO = "yolo";
 
-const DEFAULT_MODEL_ID = "zhipu-coding/glm-5";
+const DEFAULT_MODEL_ID = "zai/glm-5.1";
 const DEFAULT_MODE_ID = "code";
 
 /**
@@ -106,7 +107,7 @@ export class CrushAgent implements acp.Agent {
       agentInfo: {
         name: "crush-acp",
         title: "Crush",
-        version: "0.3.3",
+        version: "0.4.0",
       },
     };
   }

@@ -2,6 +2,21 @@
 
 All notable changes to crush-acp will be documented in this file.
 
+## [0.4.0] - 2026-03-27
+
+### Changed
+- **All models from all providers** now appear in the model dropdown (not just Zhipu)
+- Model list fetched dynamically from `crush models` with no provider filtering
+- Default model changed to `zai/glm-5.1` (latest)
+- Improved model display names showing `provider/model-name` format
+
+### Added
+- **Windows Setup Guide** (`WINDOWS.md`) — complete instructions for Windows + Zed
+- Thinking and Yolo toggle dropdowns with labeled options ("Thinking: On/Off", "Yolo: On/Off")
+- Tooltip descriptions on all config options
+- Updated README with complete provider/model reference table
+- Slash commands reference in README
+
 ## [0.3.3] - 2026-03-27
 
 ### Changed
