@@ -2,6 +2,13 @@
 
 All notable changes to crush-acp will be documented in this file.
 
+## [0.3.1] - 2026-03-27
+
+### Added
+- Crush CLI slash commands: `/models`, `/logs`, `/projects`, `/stats`, `/dirs`
+- All slash commands now registered with Zed's command palette
+- `/help` shows all available commands organized by category
+
 ## [0.3.0] - 2026-03-27
 
 ### Added

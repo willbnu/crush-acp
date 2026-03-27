@@ -310,6 +310,7 @@ export class CrushAgent implements acp.Agent {
 
   private sendAvailableCommands(sessionId: string): void {
     const commands: acp.AvailableCommand[] = [
+      // Crush CLI commands
       {
         name: "clear",
         description: "Clear conversation context and start fresh",
@@ -329,6 +330,26 @@ export class CrushAgent implements acp.Agent {
       {
         name: "mode",
         description: "Switch mode: code, ask, architect, or yolo",
+      },
+      {
+        name: "models",
+        description: "List all available AI models from configured providers",
+      },
+      {
+        name: "logs",
+        description: "View crush logs (usage: /logs [--tail N])",
+      },
+      {
+        name: "projects",
+        description: "List project directories where Crush has been used",
+      },
+      {
+        name: "stats",
+        description: "Show usage statistics",
+      },
+      {
+        name: "dirs",
+        description: "Print directories used by Crush (data, config, etc.)",
       },
     ];
 
@@ -412,11 +433,21 @@ export class CrushAgent implements acp.Agent {
         break;
       case "help":
         response = `**Available Commands:**
+
+**Session Control:**
 - \`/clear\` - Clear conversation context
 - \`/compact\` - Compact conversation history
-- \`/help\` - Show this help message
+
+**Model & Mode:**
 - \`/model <id>\` - Switch AI model
 - \`/mode <mode>\` - Switch mode (code, ask, architect, yolo)
+- \`/models\` - List all available AI models
+
+**Crush CLI:**
+- \`/logs [--tail N]\` - View crush logs
+- \`/projects\` - List project directories
+- \`/stats\` - Show usage statistics
+- \`/dirs\` - Print directories used by Crush
 
 **Current Settings:**
 - Model: ${session.currentModelId}
@@ -454,6 +485,49 @@ export class CrushAgent implements acp.Agent {
           }
         } else {
           response = `Current mode: ${session.currentModeId}\nUsage: /mode <code|ask|architect|yolo>`;
+        }
+        break;
+      case "models":
+        try {
+          const output = execSync("crush models", { encoding: "utf-8", timeout: 10000 });
+          const lines = output.trim().split("\n").filter(Boolean);
+          const modelList = lines.slice(0, 30).join("\n");
+          response = `**Available Models** (${lines.length} total):\n\`\`\`\n${modelList}${lines.length > 30 ? "\n..." : ""}\n\`\`\``;
+        } catch (err) {
+          response = "Failed to fetch models. Make sure crush CLI is available.";
+        }
+        break;
+      case "logs":
+        try {
+          const tailFlag = args.includes("--tail") ? `--tail ${args[args.indexOf("--tail") + 1] || "50"}` : "--tail 50";
+          const output = execSync(`crush logs ${tailFlag}`, { encoding: "utf-8", timeout: 10000 });
+          response = `**Crush Logs:**\n\`\`\`\n${output.slice(-3000)}\n\`\`\``;
+        } catch (err) {
+          response = "Failed to fetch logs. Make sure crush CLI is available.";
+        }
+        break;
+      case "projects":
+        try {
+          const output = execSync("crush projects", { encoding: "utf-8", timeout: 10000 });
+          response = `**Crush Projects:**\n\`\`\`\n${output}\n\`\`\``;
+        } catch (err) {
+          response = "Failed to fetch projects. Make sure crush CLI is available.";
+        }
+        break;
+      case "stats":
+        try {
+          const output = execSync("crush stats", { encoding: "utf-8", timeout: 10000 });
+          response = `**Crush Statistics:**\n\`\`\`\n${output}\n\`\`\``;
+        } catch (err) {
+          response = "Failed to fetch stats. Make sure crush CLI is available.";
+        }
+        break;
+      case "dirs":
+        try {
+          const output = execSync("crush dirs", { encoding: "utf-8", timeout: 10000 });
+          response = `**Crush Directories:**\n\`\`\`\n${output}\n\`\`\``;
+        } catch (err) {
+          response = "Failed to fetch directories. Make sure crush CLI is available.";
         }
         break;
       default:
