@@ -227,7 +227,7 @@ export class CrushAgent implements acp.Agent {
    * Check if a model supports vision/images
    */
   private isVisionModel(modelId: string): boolean {
-    const visionKeywords = ["v", "vision", "4.5", "4.6", "4v", "glm-4"];
+    const visionKeywords = ["glm-4.5v", "glm-4.6v", "glm-4v", "4.5v", "4.6v", "4v", "vision"];
     const lowerModel = modelId.toLowerCase();
     return visionKeywords.some(keyword => lowerModel.includes(keyword));
   }
