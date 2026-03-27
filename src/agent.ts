@@ -44,12 +44,9 @@ function fetchAvailableModels(): acp.ModelInfo[] {
   } catch (err) {
     console.error("[crush-acp] Failed to fetch models from Crush CLI, using defaults:", err);
     return [
-      { modelId: "zai/glm-5.1", name: "zai/glm-5.1", description: "GLM-5.1 (Latest)" },
-      { modelId: "zai/glm-5", name: "zai/glm-5", description: "GLM-5" },
-      { modelId: "zai/glm-4.7", name: "zai/glm-4.7", description: "GLM-4.7" },
-      { modelId: "zai/glm-4.7-flash", name: "zai/glm-4.7-flash", description: "GLM-4.7 Flash (Fast)" },
       { modelId: "openai/gpt-5.1", name: "openai/gpt-5.1", description: "GPT-5.1" },
       { modelId: "anthropic/claude-sonnet-4.5", name: "anthropic/claude-sonnet-4.5", description: "Claude Sonnet 4.5" },
+      { modelId: "openrouter/google/gemini-2.5-pro", name: "openrouter/google/gemini-2.5-pro", description: "Gemini 2.5 Pro" },
     ];
   }
 }
@@ -70,7 +67,7 @@ const CONFIG_MODEL = "model";
 const CONFIG_THINKING = "thinking";
 const CONFIG_YOLO = "yolo";
 
-const DEFAULT_MODEL_ID = "zai/glm-5.1";
+const DEFAULT_MODEL_ID = "openai/gpt-5.1";
 const DEFAULT_MODE_ID = "code";
 
 /**

@@ -45,14 +45,12 @@ Crush is your terminal coding bestie - a powerful AI assistant that works direct
 
 2. Configure your API key:
    ```bash
-   # For Zhipu (default)
-   crush login zhipu
-   
-   # For Anthropic
+   # Set the key for your preferred provider
    export ANTHROPIC_API_KEY=sk-...
-   
-   # For OpenAI
+   # or
    export OPENAI_API_KEY=sk-...
+   # or
+   export GEMINI_API_KEY=...
    ```
 
 ### Install the Adapter
@@ -163,19 +161,17 @@ crush-acp automatically fetches **all models** from all providers configured in 
 
 | Provider | Example Models |
 |----------|---------------|
-| **Zhipu AI (zai/)** | GLM-5.1, GLM-5, GLM-5-Turbo, GLM-4.7, GLM-4.7-Flash, GLM-4.6, GLM-4.6V, GLM-4.5, GLM-4.5v, GLM-4.5-Air |
-| **Zhipu Coding (zhipu-coding/)** | GLM-5, GLM-4.7, GLM-4.7-Flash, GLM-4.6, GLM-4.6V, GLM-4.5, GLM-4.5v, GLM-4.5-Air |
-| **OpenAI (openai/)** | GPT-5.4-Pro, GPT-5.4, GPT-5.3-Codex, GPT-5.2, GPT-5.1, GPT-5, O4-Mini, O3 |
-| **Anthropic (openrouter/anthropic/)** | Claude Opus 4.6, Claude Sonnet 4.6, Claude Sonnet 4.5, Claude Haiku 4.5 |
-| **Google (openrouter/google/)** | Gemini 3.1-Pro, Gemini 3-Flash, Gemini 2.5-Pro, Gemini 2.5-Flash |
-| **DeepSeek (openrouter/deepseek/)** | DeepSeek V3.2, DeepSeek R1-0528, DeepSeek Chat |
-| **Mistral (openrouter/mistralai/)** | Mistral Large, Devstral Medium, Codestral, Mistral Medium 3.1 |
-| **Meta (openrouter/meta-llama/)** | Llama 4 Maverick, Llama 4 Scout, Llama 3.3 70B |
-| **xAI (openrouter/x-ai/)** | Grok 4, Grok 4 Fast, Grok 4.1 Fast, Grok 3 |
-| **Qwen (openrouter/qwen/)** | Qwen 3.5-397B, Qwen 3 Coder, Qwen 3 Max, Qwen 3 235B |
-| **Cerebras (cerebras/)** | GPT-OSS-120B, Qwen-3-235B, GLM-4.7 |
-| **Groq (groq/)** | Kimi-K2, Qwen3-32B |
-| **Chutes (chutes/)** | DeepSeek R1, DeepSeek V3.1, Qwen3 models, GLM-4.5 |
+| **OpenAI** | GPT-5.4-Pro, GPT-5.4, GPT-5.3-Codex, GPT-5.2, GPT-5.1, GPT-5, O4-Mini, O3 |
+| **Anthropic** | Claude Opus 4.6, Claude Sonnet 4.6, Claude Sonnet 4.5, Claude Haiku 4.5 |
+| **Google** | Gemini 3.1-Pro, Gemini 3-Flash, Gemini 2.5-Pro, Gemini 2.5-Flash |
+| **DeepSeek** | DeepSeek V3.2, DeepSeek R1-0528, DeepSeek Chat |
+| **Mistral** | Mistral Large, Devstral Medium, Codestral, Mistral Medium 3.1 |
+| **Meta** | Llama 4 Maverick, Llama 4 Scout, Llama 3.3 70B |
+| **xAI** | Grok 4, Grok 4 Fast, Grok 4.1 Fast, Grok 3 |
+| **Qwen** | Qwen 3.5-397B, Qwen 3 Coder, Qwen 3 Max, Qwen 3 235B |
+| **Cerebras** | GPT-OSS-120B, Qwen-3-235B |
+| **Groq** | Kimi-K2, Qwen3-32B |
+| **OpenRouter** | Access to 200+ models from all providers |
 | **Others** | Moonshot Kimi, MiniMax, Cohere, Baidu Ernie, Xiaomi MiMo, StepFun, NVIDIA Nemotron, and more |
 
 The full list is dynamic — run `crush models` to see every model available with your current configuration.
@@ -186,15 +182,13 @@ Crush supports multiple providers. Set the appropriate environment variable:
 
 | Variable | Provider |
 |----------|----------|
-| `ZHIPU_API_KEY` | Zhipu AI (GLM models, default) |
 | `ANTHROPIC_API_KEY` | Anthropic (Claude) |
 | `OPENAI_API_KEY` | OpenAI (GPT) |
 | `GEMINI_API_KEY` | Google Gemini |
 | `GROQ_API_KEY` | Groq |
 | `OPENROUTER_API_KEY` | OpenRouter (access to 200+ models) |
-| `VERCEL_API_KEY` | Vercel AI Gateway |
 | `CEREBRAS_API_KEY` | Cerebras |
-| `CHUTES_API_KEY` | Chutes |
+| `VERCEL_API_KEY` | Vercel AI Gateway |
 
 ### Session Modes
 

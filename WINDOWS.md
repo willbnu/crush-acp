@@ -38,17 +38,13 @@ npm run build
 Crush needs an API key to talk to model providers. Set it as an environment variable:
 
 ```powershell
-# Zhipu AI (default, GLM models)
-crush login zhipu
-
-# Or set environment variables manually:
-$env:ZHIPU_API_KEY = "your-key-here"
-
-# Other providers:
+# Set the key for your preferred provider
 $env:ANTHROPIC_API_KEY = "sk-..."
+# or
 $env:OPENAI_API_KEY = "sk-..."
+# or
 $env:GEMINI_API_KEY = "..."
-$env:GROQ_API_KEY = "..."
+# or
 $env:OPENROUTER_API_KEY = "..."
 ```
 
@@ -58,8 +54,8 @@ To persist across sessions, set it in System Properties → Environment Variable
 # Edit your profile
 notepad $PROFILE
 
-# Add this line:
-$env:ZHIPU_API_KEY = "your-key-here"
+# Add your API key, e.g.:
+$env:ANTHROPIC_API_KEY = "sk-..."
 ```
 
 ## Configure Zed
@@ -129,7 +125,8 @@ If you prefer not to set environment variables globally, you can pass them throu
       "command": "crush-acp",
       "args": [],
       "env": {
-        "ZHIPU_API_KEY": "your-key-here"
+        "ANTHROPIC_API_KEY": "sk-...",
+        "OPENAI_API_KEY": "sk-..."
       }
     }
   }
@@ -196,7 +193,7 @@ Run this manually to verify Crush can list models:
 ```powershell
 crush models
 ```
-If it fails, your API key is likely not configured. Run `crush login zhipu` or set the environment variable.
+If it fails, your API key is likely not configured. Set the appropriate environment variable for your provider.
 
 ### Connection errors in Zed
 
