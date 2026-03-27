@@ -188,7 +188,7 @@ export class CrushAgent implements acp.Agent {
       const promptText = this.extractPromptText(params.prompt, session.currentModelId);
       
       // Extract any file paths mentioned
-      const filePaths = this.extractFilePaths(params.prompt);
+      const filePaths = this.extractFilePaths(params.prompt, session.currentModelId);
 
       await this.runCrush(
         session,
@@ -267,9 +267,12 @@ export class CrushAgent implements acp.Agent {
 
   /**
    * Extract file paths from prompt context (resource links)
+   * Filters out image files for non-vision models to prevent errors
    */
-  private extractFilePaths(prompt: Array<acp.ContentBlock>): string[] {
+  private extractFilePaths(prompt: Array<acp.ContentBlock>, modelId: string): string[] {
     const paths: string[] = [];
+    const isVision = this.isVisionModel(modelId);
+    const imageExtensions = [".png", ".jpg", ".jpeg", ".gif", ".bmp", ".webp", ".svg"];
     
     for (const block of prompt) {
       if (block.type === "resource_link") {
@@ -277,7 +280,11 @@ export class CrushAgent implements acp.Agent {
         if (block.uri && typeof block.uri === "string") {
           // Convert file:// URI to path
           const path = block.uri.replace(/^file:\/\//, "");
-          paths.push(path);
+          // Skip image files for non-vision models
+          const isImage = imageExtensions.some(ext => path.toLowerCase().endsWith(ext));
+          if (isVision || !isImage) {
+            paths.push(path);
+          }
         }
       }
     }
