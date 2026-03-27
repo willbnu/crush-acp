@@ -302,13 +302,24 @@ export class CrushAgent implements acp.Agent {
     abortSignal: AbortSignal
   ): Promise<void> {
     return new Promise((resolve, reject) => {
+      // Filter image file references from prompt text for non-vision models
+      const isVisionFilter = this.isVisionModel(session.currentModelId);
+      const imageExts = [".png", ".jpg", ".jpeg", ".gif", ".bmp", ".webp", ".svg"];
+      let userPrompt = prompt;
+      if (!isVisionFilter) {
+        for (const ext of imageExts) {
+          const re = new RegExp(`@\S*` + ext.replace(".", "\.") + `(\s|$)`, "gi");
+          userPrompt = userPrompt.replace(re, " ");
+        }
+        userPrompt = userPrompt.replace(/\s+/g, " ").trim();
+      }
       // Build the prompt with context files
-      let fullPrompt = prompt;
+      let fullPrompt = userPrompt;
       if (contextPaths.length > 0) {
         const contextSection = contextPaths
           .map((p) => `@${p}`)
           .join(" ");
-        fullPrompt = `${contextSection}\n\n${prompt}`;
+        fullPrompt = `${contextSection}\n\n${userPrompt}`;
       }
 
       // Build args with model selection
