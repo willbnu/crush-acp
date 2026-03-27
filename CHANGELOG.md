@@ -2,6 +2,19 @@
 
 All notable changes to crush-acp will be documented in this file.
 
+## [0.3.3] - 2026-03-27
+
+### Changed
+- Slash commands now match Crush TUI naming for consistency
+- `/clear` renamed to `/new` (matches Crush "New Session")
+- Command descriptions simplified to brief 1-phrase format
+
+### Added
+- **Thinking toggle** - Added as dropdown option in session config (also available via `/thinking`)
+- **Yolo toggle** - Added as dropdown option in session config (also available via `/yolo`)
+- `/status` now shows Thinking and Yolo states
+- `/help` now shows current toggle states
+
 ## [0.3.2] - 2026-03-27
 
 ### Added

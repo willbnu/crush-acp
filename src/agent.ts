@@ -10,6 +10,7 @@ interface CrushSession {
   currentModelId: string;
   currentModeId: string;
   yoloMode: boolean;
+  thinkingMode: boolean;
   toolCallCounter: number;
 }
 
@@ -65,6 +66,8 @@ const AVAILABLE_MODES: acp.SessionMode[] = [
 // Session config option IDs
 const CONFIG_MODE = "mode";
 const CONFIG_MODEL = "model";
+const CONFIG_THINKING = "thinking";
+const CONFIG_YOLO = "yolo";
 
 const DEFAULT_MODEL_ID = "zhipu-coding/glm-5";
 const DEFAULT_MODE_ID = "code";
@@ -103,7 +106,7 @@ export class CrushAgent implements acp.Agent {
       agentInfo: {
         name: "crush-acp",
         title: "Crush",
-        version: "0.3.0",
+        version: "0.3.3",
       },
     };
   }
@@ -130,13 +133,14 @@ export class CrushAgent implements acp.Agent {
       currentModelId: DEFAULT_MODEL_ID,
       currentModeId: DEFAULT_MODE_ID,
       yoloMode: false,
+      thinkingMode: false,
       toolCallCounter: 0,
     });
 
     // Send available commands to the client
     setTimeout(() => this.sendAvailableCommands(sessionId), 100);
 
-    // Build configOptions - mode first, then model
+    // Build configOptions - mode first, then model, then toggles
     const configOptions: acp.SessionConfigOption[] = [
       {
         id: CONFIG_MODE,
@@ -163,6 +167,22 @@ export class CrushAgent implements acp.Agent {
           name: model.name,
           description: model.description,
         })),
+      },
+      {
+        id: CONFIG_THINKING,
+        name: "Thinking",
+        description: "Extended thinking mode for reasoning models",
+        type: "boolean",
+        currentValue: false,
+        category: "behavior",
+      },
+      {
+        id: CONFIG_YOLO,
+        name: "Yolo",
+        description: "Auto-accept all permissions",
+        type: "boolean",
+        currentValue: false,
+        category: "behavior",
       },
     ];
 
@@ -261,6 +281,22 @@ export class CrushAgent implements acp.Agent {
       }
     }
 
+    // Handle thinking mode toggle
+    if (params.configId === CONFIG_THINKING) {
+      session.thinkingMode = params.value as boolean;
+    }
+
+    // Handle yolo mode toggle
+    if (params.configId === CONFIG_YOLO) {
+      session.yoloMode = params.value as boolean;
+      // Sync with mode selector
+      if (session.yoloMode && session.currentModeId !== "yolo") {
+        session.currentModeId = "yolo";
+      } else if (!session.yoloMode && session.currentModeId === "yolo") {
+        session.currentModeId = "code";
+      }
+    }
+
     // Return ALL config options with current values
     return {
       configOptions: this.buildConfigOptions(session),
@@ -294,6 +330,22 @@ export class CrushAgent implements acp.Agent {
           name: model.name,
           description: model.description,
         })),
+      },
+      {
+        id: CONFIG_THINKING,
+        name: "Thinking",
+        description: "Extended thinking mode for reasoning models",
+        type: "boolean",
+        currentValue: session.thinkingMode,
+        category: "behavior",
+      },
+      {
+        id: CONFIG_YOLO,
+        name: "Yolo",
+        description: "Auto-accept all permissions",
+        type: "boolean",
+        currentValue: session.yoloMode,
+        category: "behavior",
       },
     ];
   }
@@ -414,7 +466,8 @@ export class CrushAgent implements acp.Agent {
         response = `**Session Status**
 - Model: ${session.currentModelId}
 - Mode: ${session.currentModeId}
-- Yolo Mode: ${session.yoloMode ? "Enabled" : "Disabled"}
+- Thinking: ${session.thinkingMode ? "Enabled" : "Disabled"}
+- Yolo: ${session.yoloMode ? "Enabled" : "Disabled"}
 - Working Dir: ${session.workingDir}`;
         break;
       case "export":
@@ -481,7 +534,9 @@ I can review your changes. Try one of these prompts:
 
 **Current Settings:**
 - Model: ${session.currentModelId}
-- Mode: ${session.currentModeId}`;
+- Mode: ${session.currentModeId}
+- Thinking: ${session.thinkingMode ? "On" : "Off"}
+- Yolo: ${session.yoloMode ? "On" : "Off"}`;
         break;
       case "model":
         if (args[0]) {
@@ -518,8 +573,9 @@ I can review your changes. Try one of these prompts:
         }
         break;
       case "thinking":
-        // Toggle thinking mode (indicated by model selection or prompt prefix)
-        response = `Extended thinking mode toggle requested.\nTo use thinking mode, select a model that supports extended thinking (e.g., models with thinking/reasoning capabilities).`;
+        session.thinkingMode = !session.thinkingMode;
+        response = `Thinking mode: ${session.thinkingMode ? "Enabled" : "Disabled"}`;
+        this.notifyConfigUpdate(session.id, session);
         break;
       case "yolo":
         // Toggle yolo mode
