@@ -104,7 +104,7 @@ export class CrushAgent implements acp.Agent {
       agentInfo: {
         name: "crush-acp",
         title: "Crush",
-        version: "0.4.0",
+        version: "0.4.1",
       },
     };
   }
@@ -681,7 +681,11 @@ I can review your changes. Try one of these prompts:
    * Check if a model supports vision/images
    */
   private isVisionModel(modelId: string): boolean {
-    const visionKeywords = ["glm-4.5v", "glm-4.6v", "glm-4v", "4.5v", "4.6v", "4v", "vision"];
+    const visionKeywords = [
+      "vision", "gpt-4o", "gpt-4-turbo", "gpt-4g", "o1", "o3", "o4",
+      "claude-3.5", "claude-4", "gemini", "pixtral", "qwen-vl",
+      "glm-4v", "glm-4.5v", "glm-4.6v", "4.5v", "4.6v", "4v",
+    ];
     const lowerModel = modelId.toLowerCase();
     return visionKeywords.some(keyword => lowerModel.includes(keyword));
   }

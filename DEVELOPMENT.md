@@ -119,7 +119,7 @@ Changed from `type: "boolean"` to `type: "select"` with explicit on/off options:
 After fixing the boolean type issue, Zed's toolbar showed:
 
 ```
-Yolo ▾  GLM-5.1 ▾  Enabled ▾  Enabled ▾
+Yolo ▾  GPT-5.1 ▾  Enabled ▾  Enabled ▾
 ```
 
 Two dropdowns both showing "Enabled" with no way to tell which was Thinking and which was Yolo.
@@ -169,7 +169,7 @@ Thinking: Off ▾  Yolo: Off ▾  Mode ▾  Model ▾
 
 ### The Problem
 
-The model dropdown only showed ~20 models from `zhipu-coding/` and `zai/` providers, even though `crush models` returns 200+ models from 15+ providers.
+The model dropdown originally only showed models from a single provider, even though `crush models` returns 200+ models from 15+ providers.
 
 ### Root Cause
 
@@ -177,12 +177,11 @@ The original code filtered the model list:
 
 ```typescript
 const filteredLines = lines.filter(line => 
-  line.startsWith("zhipu-coding/") || 
-  line.startsWith("zai/")
+  line.startsWith("specific-provider/") 
 ).slice(0, 20);
 ```
 
-This was done initially to keep the dropdown manageable and because the developer was primarily using Zhipu models.
+This was done initially to keep the dropdown manageable during early development.
 
 ### The Fix
 
@@ -239,7 +238,7 @@ Added `isVisionModel()` check and filter image references at three levels:
 
 ```typescript
 private isVisionModel(modelId: string): boolean {
-  const visionKeywords = ["glm-4.5v", "glm-4.6v", "4.5v", "4.6v", "vision"];
+  const visionKeywords = ["vision", "gpt-4o", "claude-3.5", "gemini", "pixtral", "qwen-vl", "4.5v", "4.6v"];
   const lowerModel = modelId.toLowerCase();
   return visionKeywords.some(keyword => lowerModel.includes(keyword));
 }

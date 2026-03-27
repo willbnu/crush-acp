@@ -2,12 +2,21 @@
 
 All notable changes to crush-acp will be documented in this file.
 
+## [0.4.1] - 2026-03-27
+
+### Fixed
+- Removed all provider-specific/personal references from docs and source
+- `isVisionModel()` now detects vision models from all major providers (OpenAI, Anthropic, Google, Mistral, Qwen, GLM)
+- CHANGELOG.md corrected default model reference to match source code
+- DEVELOPMENT.md cleaned of personal provider references
+- Vision warning system prompt added for non-vision models
+
 ## [0.4.0] - 2026-03-27
 
 ### Changed
 - **All models from all providers** now appear in the model dropdown (not just Zhipu)
 - Model list fetched dynamically from `crush models` with no provider filtering
-- Default model changed to `zai/glm-5.1` (latest)
+- Default model changed to `openai/gpt-5.1` (provider-neutral)
 - Improved model display names showing `provider/model-name` format
 
 ### Added
