@@ -1,6 +1,6 @@
 {
   "name": "crush-acp",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "ACP adapter for Crush CLI - use Crush from Zed and other ACP-compatible editors",
   "type": "module",
   "main": "dist/index.js",
@@ -25,7 +25,7 @@
   "author": "Charmbracelet",
   "license": "MIT",
   "dependencies": {
-    "@agentclientprotocol/sdk": "^0.13.0"
+    "@agentclientprotocol/sdk": "^0.17.1"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

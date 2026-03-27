@@ -9,6 +9,7 @@ interface CrushSession {
   process: ChildProcess | null;
   currentModelId: string;
   currentModeId: string;
+  yoloMode: boolean;
   toolCallCounter: number;
 }
 
@@ -18,7 +19,13 @@ function fetchAvailableModels(): acp.ModelInfo[] {
     const output = execSync("crush models", { encoding: "utf-8", timeout: 5000 });
     const lines = output.trim().split("\n").filter(Boolean);
     
-    return lines.map(line => {
+    // Filter to zhipu-coding models (primary provider) and limit to reasonable list
+    const filteredLines = lines.filter(line => 
+      line.startsWith("zhipu-coding/") || 
+      line.startsWith("zai/")
+    ).slice(0, 20);
+    
+    return filteredLines.map(line => {
       const modelId = line.trim();
       const name = modelId.split("/").pop() || modelId;
       const isVision = name.includes("v") || name.toLowerCase().includes("vision");
@@ -52,7 +59,12 @@ const AVAILABLE_MODES: acp.SessionMode[] = [
   { id: "code", name: "Code", description: "Full coding mode with file access and terminal" },
   { id: "ask", name: "Ask", description: "Ask questions without making changes" },
   { id: "architect", name: "Architect", description: "Plan and design without implementation" },
+  { id: "yolo", name: "Yolo", description: "Auto-accept all permissions (dangerous mode)" },
 ];
+
+// Session config option IDs
+const CONFIG_MODE = "mode";
+const CONFIG_MODEL = "model";
 
 const DEFAULT_MODEL_ID = "zhipu-coding/glm-5";
 const DEFAULT_MODE_ID = "code";
@@ -91,7 +103,7 @@ export class CrushAgent implements acp.Agent {
       agentInfo: {
         name: "crush-acp",
         title: "Crush",
-        version: "0.2.0",
+        version: "0.3.0",
       },
     };
   }
@@ -117,11 +129,46 @@ export class CrushAgent implements acp.Agent {
       process: null,
       currentModelId: DEFAULT_MODEL_ID,
       currentModeId: DEFAULT_MODE_ID,
+      yoloMode: false,
       toolCallCounter: 0,
     });
 
+    // Send available commands to the client
+    setTimeout(() => this.sendAvailableCommands(sessionId), 100);
+
+    // Build configOptions - mode first, then model
+    const configOptions: acp.SessionConfigOption[] = [
+      {
+        id: CONFIG_MODE,
+        name: "Mode",
+        description: "Session operating mode",
+        type: "select",
+        currentValue: DEFAULT_MODE_ID,
+        category: "mode",
+        options: AVAILABLE_MODES.map(mode => ({
+          value: mode.id,
+          name: mode.name,
+          description: mode.description,
+        })),
+      },
+      {
+        id: CONFIG_MODEL,
+        name: "Model",
+        description: "AI model to use",
+        type: "select",
+        currentValue: DEFAULT_MODEL_ID,
+        category: "model",
+        options: AVAILABLE_MODELS.map(model => ({
+          value: model.modelId,
+          name: model.name,
+          description: model.description,
+        })),
+      },
+    ];
+
     return {
       sessionId,
+      // Keep old fields for backwards compatibility
       models: {
         availableModels: AVAILABLE_MODELS,
         currentModelId: DEFAULT_MODEL_ID,
@@ -130,6 +177,8 @@ export class CrushAgent implements acp.Agent {
         availableModes: AVAILABLE_MODES,
         currentModeId: DEFAULT_MODE_ID,
       },
+      // New preferred configOptions
+      configOptions,
     };
   }
 
@@ -147,6 +196,16 @@ export class CrushAgent implements acp.Agent {
     if (session) {
       session.currentModeId = params.modeId;
       
+      // If yolo mode is selected, also enable yoloMode toggle
+      if (params.modeId === "yolo") {
+        session.yoloMode = true;
+        this.notifyConfigUpdate(params.sessionId, session);
+      } else if (session.currentModeId === "yolo") {
+        // Switching away from yolo mode, disable it
+        session.yoloMode = false;
+        this.notifyConfigUpdate(params.sessionId, session);
+      }
+      
       // Notify client of mode change
       this.connection.sessionUpdate({
         sessionId: params.sessionId,
@@ -157,6 +216,129 @@ export class CrushAgent implements acp.Agent {
       }).catch(console.error);
     }
     return {};
+  }
+
+  async setSessionConfigOption(
+    params: acp.SetSessionConfigOptionRequest
+  ): Promise<acp.SetSessionConfigOptionResponse> {
+    const session = this.sessions.get(params.sessionId);
+    if (!session) {
+      throw acp.RequestError.invalidParams(
+        `Session ${params.sessionId} not found`
+      );
+    }
+
+    // Handle mode change via config option
+    if (params.configId === CONFIG_MODE) {
+      const newModeId = params.value as string;
+      if (AVAILABLE_MODES.some(m => m.id === newModeId)) {
+        const oldModeId = session.currentModeId;
+        session.currentModeId = newModeId;
+        
+        // Handle yolo mode sync
+        if (newModeId === "yolo") {
+          session.yoloMode = true;
+        } else if (oldModeId === "yolo") {
+          session.yoloMode = false;
+        }
+        
+        // Notify via old API for backwards compatibility
+        this.connection.sessionUpdate({
+          sessionId: params.sessionId,
+          update: {
+            sessionUpdate: "current_mode_update",
+            currentModeId: newModeId,
+          },
+        }).catch(console.error);
+      }
+    }
+    
+    // Handle model change via config option
+    if (params.configId === CONFIG_MODEL) {
+      const newModelId = params.value as string;
+      if (AVAILABLE_MODELS.some(m => m.modelId === newModelId)) {
+        session.currentModelId = newModelId;
+      }
+    }
+
+    // Return ALL config options with current values
+    return {
+      configOptions: this.buildConfigOptions(session),
+    };
+  }
+
+  private buildConfigOptions(session: CrushSession): acp.SessionConfigOption[] {
+    return [
+      {
+        id: CONFIG_MODE,
+        name: "Mode",
+        description: "Session operating mode",
+        type: "select",
+        currentValue: session.currentModeId,
+        category: "mode",
+        options: AVAILABLE_MODES.map(mode => ({
+          value: mode.id,
+          name: mode.name,
+          description: mode.description,
+        })),
+      },
+      {
+        id: CONFIG_MODEL,
+        name: "Model",
+        description: "AI model to use",
+        type: "select",
+        currentValue: session.currentModelId,
+        category: "model",
+        options: AVAILABLE_MODELS.map(model => ({
+          value: model.modelId,
+          name: model.name,
+          description: model.description,
+        })),
+      },
+    ];
+  }
+
+  private notifyConfigUpdate(sessionId: string, session: CrushSession): void {
+    this.connection.sessionUpdate({
+      sessionId,
+      update: {
+        sessionUpdate: "config_option_update",
+        configOptions: this.buildConfigOptions(session),
+      },
+    }).catch(console.error);
+  }
+
+  private sendAvailableCommands(sessionId: string): void {
+    const commands: acp.AvailableCommand[] = [
+      {
+        name: "clear",
+        description: "Clear conversation context and start fresh",
+      },
+      {
+        name: "compact",
+        description: "Compact conversation history to save context space",
+      },
+      {
+        name: "help",
+        description: "Show available commands and usage information",
+      },
+      {
+        name: "model",
+        description: "Switch AI model (usage: /model <model-id>)",
+      },
+      {
+        name: "mode",
+        description: "Switch mode: code, ask, architect, or yolo",
+      },
+    ];
+
+    this.connection.sessionUpdate({
+      sessionId,
+      update: {
+        sessionUpdate: "available_commands_update",
+        availableCommands: commands,
+      },
+    }).catch(console.error);
   }
 
   async unstable_setSessionModel(
@@ -187,6 +369,12 @@ export class CrushAgent implements acp.Agent {
       // Extract text content from the prompt
       const promptText = this.extractPromptText(params.prompt, session.currentModelId);
       
+      // Check for slash commands
+      if (promptText.startsWith("/")) {
+        await this.handleCommand(session, promptText);
+        return { stopReason: "end_turn" };
+      }
+      
       // Extract any file paths mentioned
       const filePaths = this.extractFilePaths(params.prompt, session.currentModelId);
 
@@ -206,6 +394,83 @@ export class CrushAgent implements acp.Agent {
     }
 
     return { stopReason: "end_turn" };
+  }
+
+  private async handleCommand(session: CrushSession, commandText: string): Promise<void> {
+    const parts = commandText.slice(1).trim().split(/\s+/);
+    const command = parts[0]?.toLowerCase() || "";
+    const args = parts.slice(1);
+
+    let response = "";
+
+    switch (command) {
+      case "clear":
+        response = "Conversation context cleared. Starting fresh!";
+        break;
+      case "compact":
+        response = "Conversation history compacted to save context space.";
+        break;
+      case "help":
+        response = `**Available Commands:**
+- \`/clear\` - Clear conversation context
+- \`/compact\` - Compact conversation history
+- \`/help\` - Show this help message
+- \`/model <id>\` - Switch AI model
+- \`/mode <mode>\` - Switch mode (code, ask, architect, yolo)
+
+**Current Settings:**
+- Model: ${session.currentModelId}
+- Mode: ${session.currentModeId}`;
+        break;
+      case "model":
+        if (args[0]) {
+          const newModel = args[0];
+          if (AVAILABLE_MODELS.some(m => m.modelId === newModel)) {
+            session.currentModelId = newModel;
+            response = `Model switched to: ${newModel}`;
+            this.notifyConfigUpdate(session.id, session);
+          } else {
+            response = `Unknown model: ${newModel}. Available models include: ${AVAILABLE_MODELS.slice(0, 5).map(m => m.modelId).join(", ")}...`;
+          }
+        } else {
+          response = `Current model: ${session.currentModelId}\nUsage: /model <model-id>`;
+        }
+        break;
+      case "mode":
+        if (args[0]) {
+          const newMode = args[0].toLowerCase();
+          if (["code", "ask", "architect", "yolo"].includes(newMode)) {
+            const oldMode = session.currentModeId;
+            session.currentModeId = newMode;
+            if (newMode === "yolo") {
+              session.yoloMode = true;
+            } else if (oldMode === "yolo") {
+              session.yoloMode = false;
+            }
+            response = `Mode switched to: ${newMode}`;
+            this.notifyConfigUpdate(session.id, session);
+          } else {
+            response = `Unknown mode: ${newMode}. Available modes: code, ask, architect, yolo`;
+          }
+        } else {
+          response = `Current mode: ${session.currentModeId}\nUsage: /mode <code|ask|architect|yolo>`;
+        }
+        break;
+      default:
+        response = `Unknown command: /${command}. Type /help for available commands.`;
+    }
+
+    // Send response as agent message
+    await this.connection.sessionUpdate({
+      sessionId: session.id,
+      update: {
+        sessionUpdate: "agent_message_chunk",
+        content: {
+          type: "text",
+          text: response,
+        },
+      },
+    });
   }
 
   async cancel(params: acp.CancelNotification): Promise<void> {
@@ -337,6 +602,9 @@ export class CrushAgent implements acp.Agent {
           break;
         case "architect":
           modePrompt = "[Mode: Architect - Plan and design, do not implement]\n\n";
+          break;
+        case "yolo":
+          modePrompt = "[Mode: Yolo - Auto-accept all permissions, making changes freely]\n\n";
           break;
         case "code":
         default:
