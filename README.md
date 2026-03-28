@@ -1,45 +1,40 @@
 # Crush ACP Adapter
 
 [![npm](https://img.shields.io/npm/v/crush-acp)](https://www.npmjs.com/package/crush-acp)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-Use [Crush](https://github.com/charmbracelet/crush) — Charm's AI coding agent — from [Zed](https://zed.dev) and other ACP-compatible editors via the Agent Client Protocol (ACP).
+Bring [Crush](https://github.com/charmbracelet/crush) — Charm's terminal-based AI coding agent — to [Zed](https://zed.dev) and any ACP-compatible editor.
 
-## About
+## What is this?
 
-Crush is a terminal-based AI coding assistant with multi-provider model support, built-in tools, MCP server integration, and a skill-based agent system. This adapter brings Crush to Zed's Agent Panel with full session management, mode toggles, and model selection.
+`crush-acp` is a bridge that lets you use Crush directly from Zed's Agent Panel. It implements the [Agent Client Protocol (ACP)](https://agentclientprotocol.com), streaming responses in real-time while maintaining full session continuity across conversations.
 
 ## Features
 
-- **Full Crush capabilities** from Zed's Agent Panel
-- **Session continuity** — conversations persist across messages via crush's session system
-- **Model selection** — all models from your configured providers, tagged for easy identification
-- **Session modes** — Code, Ask, Architect, and Yolo
-- **Thinking toggle** — enable extended reasoning for complex tasks
-- **Yolo toggle** — auto-accept all permissions without confirmation
-- **Vision auto-routing** — automatically switches to a vision model when images are detected
-- **Tool call visibility** — see what tools Crush is using in real-time
-- **Thinking content** — displays reasoning/thinking output when models use it
-- **Session resumption** — resume past sessions from the Zed sidebar
-- **MCP server support**
-- **LSP-enhanced context**
+| Feature                  | Description                                                               |
+| ------------------------ | ------------------------------------------------------------------------- |
+| **Session Continuity**   | Conversations persist across messages using crush's native session system |
+| **Model Selection**      | Only shows models from providers you have configured — no clutter         |
+| **Vision Auto-Routing**  | Automatically switches to a vision model when images are attached         |
+| **Session Modes**        | Code, Ask, Architect, and Yolo — switch without restarting                |
+| **Thinking Toggle**      | Enable extended reasoning for complex tasks                               |
+| **Session Resumption**   | Resume any past session from the Zed sidebar                              |
+| **Tool Call Visibility** | Watch Crush's tools in real-time as it works                              |
+| **Thinking Content**     | See reasoning output when models use it                                   |
 
 ## Requirements
 
 - [Crush CLI](https://github.com/charmbracelet/crush#installation)
-- [Zed Editor](https://zed.dev) (with ACP support)
+- [Zed Editor](https://zed.dev)
 - Node.js 18+
 
-## Installation
+## Quick Start
 
 ```bash
 npm install -g crush-acp
 ```
 
-## Configuration
-
-### 1. Set up your API key
-
-Add your API key to environment variables or to Zed's settings:
+Open Zed → `settings.json` → add:
 
 ```json
 {
@@ -49,132 +44,114 @@ Add your API key to environment variables or to Zed's settings:
       "command": "crush-acp",
       "args": [],
       "env": {
-        "ZAI_API_KEY": "your-zai-api-key"
+        "ZAI_API_KEY": "your-api-key"
       }
     }
   }
 }
 ```
 
-Supported environment variables:
+Restart Zed. Open the Agent Panel (`Ctrl+E`) → select Crush → start chatting.
 
-- `ZAI_API_KEY` — Z.AI / Zhipu models
-- `ANTHROPIC_API_KEY` — Anthropic (Claude)
-- `OPENAI_API_KEY` — OpenAI (GPT)
-- `GEMINI_API_KEY` — Google Gemini
-- `GROQ_API_KEY` — Groq
-- `OPENROUTER_API_KEY` — OpenRouter (200+ models)
-- `CEREBRAS_API_KEY` — Cerebras
+## Configuration
 
-### 2. Add to Zed settings
+### API Keys
 
-Open `settings.json` via the command palette (`Ctrl+Shift+P` → `zed: open settings`) and add:
+Set any of these environment variables for the providers you want to use:
 
-```json
-{
-  "agent_servers": {
-    "Crush": {
-      "type": "custom",
-      "command": "crush-acp",
-      "args": [],
-      "env": {}
-    }
-  }
-}
-```
+| Variable             | Provider                              |
+| -------------------- | ------------------------------------- |
+| `ZAI_API_KEY`        | Z.AI / Zhipu (GLM-5.1, GLM-4.7, etc.) |
+| `ANTHROPIC_API_KEY`  | Anthropic (Claude)                    |
+| `OPENAI_API_KEY`     | OpenAI (GPT)                          |
+| `GEMINI_API_KEY`     | Google Gemini                         |
+| `GROQ_API_KEY`       | Groq                                  |
+| `OPENROUTER_API_KEY` | OpenRouter (200+ models)              |
+| `CEREBRAS_API_KEY`   | Cerebras                              |
 
-### 3. Restart Zed
+### Provider Filtering
 
-The agent will appear in the Agent Panel (`Ctrl+E`).
+crush-acp reads your `crush.json` and only displays models from providers that have valid API keys configured. If a provider's key is missing or invalid, its models won't appear in the dropdown.
+
+### Zed Settings
+
+| Setting     | Path                                  |
+| ----------- | ------------------------------------- |
+| Settings    | `Ctrl+Shift+P` → `zed: open settings` |
+| Keymap      | `Ctrl+Shift+P` → `zed: open keymap`   |
+| Agent Panel | `Ctrl+E`                              |
 
 ## Usage
 
 ### Toolbar Controls
 
-| Dropdown     | Purpose                                   |
-| ------------ | ----------------------------------------- |
-| **Mode**     | Code (default), Ask, Architect, or Yolo   |
-| **Model**    | All models from your configured providers |
-| **Thinking** | Toggle extended thinking on/off           |
-| **Yolo**     | Toggle auto-accept all permissions        |
+| Control      | Options                    | Description                               |
+| ------------ | -------------------------- | ----------------------------------------- |
+| **Mode**     | Code, Ask, Architect, Yolo | Controls Crush's behavior and permissions |
+| **Model**    | Dynamic list               | Pick any configured provider's model      |
+| **Thinking** | On / Off                   | Enable extended reasoning                 |
+| **Yolo**     | On / Off                   | Auto-accept all file changes              |
 
 ### Session Modes
 
-| Mode          | Description                                    |
-| ------------- | ---------------------------------------------- |
-| **Code**      | Full coding mode with file access and terminal |
-| **Ask**       | Answer questions without making changes        |
-| **Architect** | Plan and design without implementation         |
-| **Yolo**      | Auto-accept all permissions (use with care)    |
+| Mode          | When to use                                           |
+| ------------- | ----------------------------------------------------- |
+| **Code**      | Default. Full file access and terminal — use normally |
+| **Ask**       | Read-only. Ask questions without touching files       |
+| **Architect** | Planning only. Design systems without implementing    |
+| **Yolo**      | Auto-accept everything. Use with caution              |
 
 ### Slash Commands
 
-| Command        | Description                              |
-| -------------- | ---------------------------------------- |
-| `/new`         | Start a fresh conversation session       |
-| `/compact`     | Summarize session to save context space  |
-| `/model <id>`  | Switch to a specific model               |
-| `/models`      | List all available models                |
-| `/mode <mode>` | Switch mode (code, ask, architect, yolo) |
-| `/thinking`    | Toggle extended thinking                 |
-| `/yolo`        | Toggle yolo mode                         |
-| `/status`      | Show current session info                |
-| `/export`      | Export session transcript                |
-| `/help`        | Show all available commands              |
-
-### Provider Filtering
-
-crush-acp automatically detects which providers you have API keys for and only shows those models in the dropdown. Providers without keys (or with invalid/empty keys) are filtered out to keep the list clean and relevant.
+| Command        | Description                       |
+| -------------- | --------------------------------- |
+| `/new`         | Fresh conversation                |
+| `/compact`     | Summarize session to save context |
+| `/model <id>`  | Switch model                      |
+| `/models`      | List available models             |
+| `/mode <mode>` | Switch mode                       |
+| `/thinking`    | Toggle thinking                   |
+| `/yolo`        | Toggle yolo mode                  |
+| `/status`      | Session info                      |
+| `/export`      | Export transcript                 |
+| `/help`        | All commands                      |
 
 ## Supported Providers
 
-The model list is dynamic — it reflects exactly what providers you have configured in your `crush.json`. Common providers include:
+crush-acp dynamically loads all models from your configured providers. Run `crush models` to see what's available for your setup.
 
-| Provider                | Notes                                        |
-| ----------------------- | -------------------------------------------- |
-| **zai**                 | Z.AI / Zhipu models (GLM-5.1, GLM-4.7, etc.) |
-| **zhipu-coding**        | Zhipu coding models                          |
-| **opencode-go**         | Free OpenCode Go models (GLM-5, Kimi K2.5)   |
-| **opencode-go-minimax** | Free MiniMax models (M2.5, M2.7)             |
-| **local-qwen**          | Local Qwen models via OAI-compatible server  |
-
-Run `crush models` in your terminal to see the full list for your configuration.
-
-## Session Persistence
-
-Sessions are persisted to `AppData/Roaming/.crush-acp/sessions/sessions.json`. Each session maintains:
-
-- Selected model and mode
-- Thinking and Yolo settings
-- Working directory
-- Conversation history via crush's session system
-
-Click any past session in the Zed sidebar to resume it.
+| Provider                | Models                                                |
+| ----------------------- | ----------------------------------------------------- |
+| **zai**                 | GLM-5.1, GLM-5, GLM-4.7, GLM-4.6V, GLM-4.5V, and more |
+| **zhipu-coding**        | Zhipu coding-specific models                          |
+| **opencode-go**         | Free GLM-5, Kimi K2.5                                 |
+| **opencode-go-minimax** | Free MiniMax M2.5, M2.7                               |
+| **local-qwen**          | Local models via OAI-compatible server                |
 
 ## Troubleshooting
 
-### "command not found" errors
-
-Make sure `crush-acp` is installed globally:
+**"command not found"**
 
 ```bash
-npm list -g crush-acp
+npm list -g crush-acp   # verify it's installed
+npm install -g crush-acp  # reinstall if needed
 ```
 
-### No models in the dropdown
+**No models in dropdown**
 
-Run `crush models` in your terminal. If it fails, your API key is not configured or is invalid.
+```bash
+crush models   # run this in your terminal — if it fails, your API key isn't set
+```
 
-### crush crashes with "database disk image is malformed"
+**"database disk image is malformed"**
 
-This is a SQLite WAL corruption issue on Windows. crush-acp isolates its data directory from the TUI crush to prevent conflicts. If it still occurs:
+```powershell
+# On Windows: delete the isolated DB and restart
+Remove-Item "$env:APPDATA\.crush-acp\zed-crush\crush.db"
+```
 
-1. Delete `AppData/Roaming/.crush-acp/zed-crush/crush.db`
-2. Restart the session
-
-### View ACP logs
-
-In Zed, open the command palette and run `dev: open acp logs` to see the JSON-RPC communication.
+**View ACP logs**
+`Ctrl+Shift+P` → `dev: open acp logs`
 
 ## Development
 
@@ -187,14 +164,16 @@ npm run build
 
 ## How It Works
 
-crush-acp implements the [Agent Client Protocol (ACP)](https://agentclientprotocol.com):
+```
+Zed ← JSON-RPC/stdio → crush-acp ← spawn → crush run -m <model> --session <id>
+```
 
-- Communicates via JSON-RPC 2.0 over stdio
-- Spawns `crush run --data-dir <isolated> --session <id> -m <model>` for each prompt
-- Streams output back to the client via `sessionUpdate` notifications
-- Parses tool call patterns from Crush output and sends `tool_call` updates
-- Extracts thinking/reasoning content wrapped in `<think/>` tags
-- Persists session configuration to `sessions.json`
+crush-acp bridges Zed's ACP interface to Crush's CLI:
+
+1. **Initialization** — advertises capabilities (session list, resume, config options)
+2. **Prompt handling** — spawns `crush run` with model, mode, and session context
+3. **Output streaming** — parses Crush's stdout for tool calls, thinking content, and responses
+4. **Session continuity** — captures crush's internal session ID and reuses it on subsequent prompts
 
 ## Links
 
