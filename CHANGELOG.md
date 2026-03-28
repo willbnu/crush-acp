@@ -2,6 +2,12 @@
 
 All notable changes to crush-acp will be documented in this file.
 
+## [0.4.4] - 2026-03-28
+
+### Added
+
+- **Windows compatibility notes** — detailed WINDOWS.md explaining SQLite WAL corruption fix, Windows-specific file paths, and debugging guide
+
 ## [0.4.3] - 2026-03-28
 
 ### Added
