@@ -243,7 +243,7 @@ export class CrushAgent implements acp.Agent {
           embeddedContext: true,
         },
         sessionCapabilities: {
-          fork: null,
+          fork: {},
           list: {},
           resume: {},
         },
@@ -251,7 +251,7 @@ export class CrushAgent implements acp.Agent {
       agentInfo: {
         name: "crush-acp",
         title: "Crush",
-        version: "0.4.1",
+        version: "0.4.4",
       },
     };
   }
@@ -375,6 +375,9 @@ export class CrushAgent implements acp.Agent {
     console.error("[crush-acp] listSessions called, saved sessions:", this.savedSessions.size);
     const sessions: acp.SessionInfo[] = Array.from(this.savedSessions.values()).map(sessionToInfo);
     console.error("[crush-acp] returning sessions:", sessions.length);
+    for (const s of sessions) {
+      console.error("[crush-acp]   session:", s.sessionId, s.title, s.cwd);
+    }
     return { sessions };
   }
 
@@ -601,6 +604,7 @@ export class CrushAgent implements acp.Agent {
     const commands: acp.AvailableCommand[] = [
       // Session management (matches Crush TUI)
       { name: "new", description: "Start a fresh conversation session" },
+      { name: "sessions", description: "List all saved sessions" },
       { name: "compact", description: "Summarize session to save context space" },
       { name: "export", description: "Export session transcript to file" },
       { name: "status", description: "Show current session info and settings" },
@@ -708,6 +712,20 @@ export class CrushAgent implements acp.Agent {
       case "session":
         response = "To start a new session, use the + button in Zed's agent panel or close this tab and open a new chat.";
         break;
+      case "sessions": {
+        const allSessions = Array.from(this.savedSessions.values());
+        if (allSessions.length === 0) {
+          response = "No saved sessions found. Send a message to start your first session.";
+        } else {
+          const lines = allSessions.map(s => {
+            const date = new Date(s.updatedAt).toLocaleString();
+            const model = s.currentModelId.split("/").pop();
+            return `- **${model}** (${s.currentModeId}) — ${date} — \`${s.id.slice(0, 8)}\``;
+          }).join("\n");
+          response = `**Saved Sessions (${allSessions.length})**\n\n${lines}\n\nClick any session in Zed's sidebar to resume it.`;
+        }
+        break;
+      }
       case "compact":
         response = "Conversation history compacted to save context space.";
         break;
