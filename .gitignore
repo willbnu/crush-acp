@@ -1,5 +1,21 @@
+# Dependencies
 node_modules/
+
+# Build output
 dist/
+
+# Logs
 *.log
+
+# OS files
 .DS_Store
+Thumbs.db
+
+# TypeScript build info
 *.tsbuildinfo
+
+# npm lock — committed so installs are deterministic
+# package-lock.json
+
+# Release binaries (keep locally, don't commit)
+release/

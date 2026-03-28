@@ -1,6 +1,6 @@
 {
   "name": "crush-acp",
-  "version": "0.2.0",
+  "version": "0.4.3",
   "description": "ACP adapter for Crush CLI - use Crush from Zed and other ACP-compatible editors",
   "type": "module",
   "main": "dist/index.js",
@@ -19,13 +19,23 @@
     "acp",
     "agent-client-protocol",
     "zed",
+    "zed-editor",
     "ai",
-    "coding-agent"
+    "coding-agent",
+    "cli",
+    "charmbracelet",
+    "openai",
+    "anthropic",
+    "google-gemini",
+    "deepseek",
+    "mistral",
+    "editor-integration",
+    "llm"
   ],
   "author": "Charmbracelet",
   "license": "MIT",
   "dependencies": {
-    "@agentclientprotocol/sdk": "^0.13.0"
+    "@agentclientprotocol/sdk": "^0.17.1"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
@@ -36,10 +46,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/charmbracelet/crush-acp"
+    "url": "https://github.com/willbnu/crush-acp"
   },
   "bugs": {
-    "url": "https://github.com/charmbracelet/crush-acp/issues"
+    "url": "https://github.com/willbnu/crush-acp/issues"
   },
-  "homepage": "https://github.com/charmbracelet/crush-acp#readme"
+  "homepage": "https://github.com/willbnu/crush-acp#readme"
 }
