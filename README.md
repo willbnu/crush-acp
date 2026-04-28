@@ -185,4 +185,6 @@ crush-acp bridges Zed's ACP interface to Crush's CLI:
 
 ## License
 
-[MIT](LICENSE)
+[MIT](LICENSE) — This adapter is my own work (William Finger). It is not affiliated with or endorsed by Charmbracelet.
+
+[Crush](https://github.com/charmbracelet/crush) is a separate project by [Charmbracelet](https://charm.sh), licensed under [FSL-1.1-MIT](https://github.com/charmbracelet/crush/raw/main/LICENSE.md). This adapter requires Crush to be installed separately.
