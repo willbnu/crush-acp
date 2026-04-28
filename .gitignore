@@ -19,3 +19,4 @@ Thumbs.db
 
 # Release binaries (keep locally, don't commit)
 release/
+.config/

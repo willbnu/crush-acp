@@ -32,7 +32,7 @@
     "editor-integration",
     "llm"
   ],
-  "author": "Charmbracelet",
+  "author": "William Finger",
   "license": "MIT",
   "dependencies": {
     "@agentclientprotocol/sdk": "^0.17.1"
