@@ -22,4 +22,4 @@ export const AVAILABLE_MODES: acp.SessionMode[] = [
   { id: "yolo", name: "Yolo", description: "Auto-accept all permissions (dangerous mode)" },
 ];
 
-export const VERSION = "0.5.0";
+export const VERSION = "0.5.1";
