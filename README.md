@@ -183,6 +183,28 @@ crush-acp bridges Zed's ACP interface to Crush's CLI:
 - [Zed Editor](https://zed.dev)
 - [Charm](https://charm.sh)
 
+## Support This Project
+
+If crush-acp saves you time, consider supporting its development:
+
+- **[GitHub Sponsors](https://github.com/sponsors/willbnu)** — recurring support
+- **[Ko-fi](https://ko-fi.com/willbnu)** — one-time donation
+
+### Pro Features (Coming Soon)
+
+| Feature | Free | Pro |
+| ------- | ---- | --- |
+| ACP bridge to Zed | Yes | Yes |
+| Session persistence | Yes | Yes |
+| Model/mode switching | Yes | Yes |
+| Vision auto-routing | Yes | Yes |
+| Usage analytics dashboard | — | Yes |
+| Multi-project session manager | — | Yes |
+| Custom prompt templates | — | Yes |
+| Priority support | — | Yes |
+
+*Star the repo and sponsor to help fund Pro development.*
+
 ## License
 
 [MIT](LICENSE) — This adapter is my own work (William Finger). It is not affiliated with or endorsed by Charmbracelet.

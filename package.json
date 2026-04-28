@@ -1,6 +1,6 @@
 {
   "name": "crush-acp",
-  "version": "0.4.4",
+  "version": "0.5.0",
   "description": "ACP adapter for Crush CLI - use Crush from Zed and other ACP-compatible editors",
   "type": "module",
   "main": "dist/index.js",
@@ -41,6 +41,10 @@
     "@types/node": "^22.0.0",
     "typescript": "^5.7.0"
   },
+  "funding": [
+    { "type": "github", "url": "https://github.com/sponsors/willbnu" },
+    { "type": "ko-fi", "url": "https://ko-fi.com/willbnu" }
+  ],
   "engines": {
     "node": ">=18.0.0"
   },

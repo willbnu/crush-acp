@@ -251,7 +251,7 @@ export class CrushAgent implements acp.Agent {
       agentInfo: {
         name: "crush-acp",
         title: "Crush",
-        version: "0.4.4",
+        version: "0.5.0",
       },
     };
   }
